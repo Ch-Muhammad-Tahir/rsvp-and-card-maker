@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'dart:math';
 
 class HelperFunction {
   static void hideKeyboard() {
@@ -22,5 +23,37 @@ class HelperFunction {
         );
       },
     );
+  }
+
+  static String generateUniqueKey(
+      {int length = 32,
+      bool caseSensitive = true,
+      bool includeSpecialChars = true}) {
+    final now = DateTime.now().millisecondsSinceEpoch;
+    final randomPart = _generateRandomString(
+      length: length - now.toString().length,
+      caseSensitive: caseSensitive,
+      includeSpecialChars: includeSpecialChars,
+    );
+    final uniqueString = '${now.toString()}$randomPart';
+    return uniqueString;
+  }
+
+  static String _generateRandomString(
+      {required int length,
+      bool caseSensitive = true,
+      bool includeSpecialChars = true}) {
+    final charPool = caseSensitive
+        ? (includeSpecialChars
+            ? 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#\$%^&*()-_=+[{]}\\|;:",<.>/?'
+            : 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789')
+        : (includeSpecialChars
+            ? 'abcdefghijklmnopqrstuvwxyz0123456789!@#\$%^&*()-_=+[{]}\\|;:",<.>/?'
+            : 'abcdefghijklmnopqrstuvwxyz0123456789');
+    final random = Random.secure();
+    final randomBytes = List<int>.generate(length, (_) => random.nextInt(256));
+    final randomString = String.fromCharCodes(randomBytes
+        .map((byte) => byte % charPool.length + charPool.codeUnitAt(0)));
+    return randomString;
   }
 }
