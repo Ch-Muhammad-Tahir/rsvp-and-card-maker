@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:rsvpandcardsmakerapp/utils/print_logs.dart';
 import '../../../domain/card_desing_model/canvas_widget_object.dart';
 
 class CustomDraggableWidget extends StatefulWidget {
@@ -32,7 +35,11 @@ class _CustomDraggableWidgetState extends State<CustomDraggableWidget> {
       top: _top,
       left: _left,
       child: GestureDetector(
-        onTap: () {},
+        onTap: () async {
+          Size size = await _calculateImageDimension();
+          PrintLogs.printLogs("Height :: ${size.height}");
+          PrintLogs.printLogs("Width :: ${size.width}");
+        },
         child: Container(
           padding: const EdgeInsets.all(5),
           decoration: BoxDecoration(
@@ -63,4 +70,19 @@ class _CustomDraggableWidgetState extends State<CustomDraggableWidget> {
 
     widget.onPositionUpdated(_top, _left);
   }
+}
+
+Future<Size> _calculateImageDimension() {
+  Completer<Size> completer = Completer();
+  Image image = Image.asset('assets/background_templates/background_1.png');
+  image.image.resolve(ImageConfiguration()).addListener(
+    ImageStreamListener(
+      (ImageInfo image, bool synchronousCall) {
+        var myImage = image.image;
+        Size size = Size(myImage.width.toDouble(), myImage.height.toDouble());
+        completer.complete(size);
+      },
+    ),
+  );
+  return completer.future;
 }

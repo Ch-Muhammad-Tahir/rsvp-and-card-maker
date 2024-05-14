@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rsvpandcardsmakerapp/common_widgets/custom_appbar.dart';
 import 'package:rsvpandcardsmakerapp/common_widgets/responsive_builder.dart';
@@ -6,7 +9,8 @@ import 'package:rsvpandcardsmakerapp/presentation/card_design/riverpods/card_des
 import 'package:rsvpandcardsmakerapp/utils/app_constants.dart';
 import 'package:rsvpandcardsmakerapp/utils/color_constant.dart';
 import 'package:rsvpandcardsmakerapp/utils/extensions.dart';
-
+import 'dart:ui' as ui;
+import 'dart:io';
 import 'widgets/drage_able_widget.dart';
 
 class CardDesiginScreen extends ConsumerWidget {
@@ -28,10 +32,13 @@ class CardDesiginScreen extends ConsumerWidget {
                 width: screenWidth * 1,
                 decoration: BoxDecoration(
                     color: ColorConstant.cyan,
-                    // border: Border.all(color: ColorConstant.cyan, width: 0.2),
                     shape: BoxShape.rectangle,
+                    image: const DecorationImage(
+                        image: AssetImage(
+                            'assets/background_templates/background_1.png'),
+                        fit: BoxFit.cover),
                     boxShadow: [
-                      BoxShadow(blurRadius: 5, color: ColorConstant.lightGrey)
+                      BoxShadow(blurRadius: 10, color: ColorConstant.lightGrey)
                     ]),
                 child: Stack(
                   children: [
