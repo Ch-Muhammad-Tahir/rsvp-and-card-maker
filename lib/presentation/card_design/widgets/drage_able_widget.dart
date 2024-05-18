@@ -1,17 +1,17 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
-import 'package:rsvpandcardsmakerapp/utils/print_logs.dart';
+import 'package:rsvpandcardsmakerapp/utils/color_constant.dart';
 import '../../../domain/card_desing_model/canvas_widget_object.dart';
 
 class CustomDraggableWidget extends StatefulWidget {
   final CanvasWidgetObject object;
   final Function(double top, double left) onPositionUpdated;
+  final VoidCallback onTap;
 
   const CustomDraggableWidget({
     super.key,
     required this.object,
     required this.onPositionUpdated,
+    required this.onTap,
   });
 
   @override
@@ -35,21 +35,25 @@ class _CustomDraggableWidgetState extends State<CustomDraggableWidget> {
       top: _top,
       left: _left,
       child: GestureDetector(
-        onTap: () async {
-          Size size = await _calculateImageDimension();
-          PrintLogs.printLogs("Height :: ${size.height}");
-          PrintLogs.printLogs("Width :: ${size.width}");
-        },
+        onTap: widget.onTap,
         child: Container(
           padding: const EdgeInsets.all(5),
           decoration: BoxDecoration(
-            border: Border.all(color: Colors.black),
+            border: widget.object.isSelected
+                ? Border.all(color: Colors.black)
+                : null,
             borderRadius: BorderRadius.circular(8),
           ),
           child: Draggable(
             onDragUpdate: _handleDragUpdate,
             feedback: Container(),
-            child: Text(widget.object.text),
+            child: Text(
+              widget.object.text,
+              style: TextStyle(
+                fontSize: double.tryParse(widget.object.fontSize) ?? 40,
+                color: HexColor(widget.object.color),
+              ),
+            ),
           ),
         ),
       ),
@@ -70,19 +74,4 @@ class _CustomDraggableWidgetState extends State<CustomDraggableWidget> {
 
     widget.onPositionUpdated(_top, _left);
   }
-}
-
-Future<Size> _calculateImageDimension() {
-  Completer<Size> completer = Completer();
-  Image image = Image.asset('assets/background_templates/background_1.png');
-  image.image.resolve(ImageConfiguration()).addListener(
-    ImageStreamListener(
-      (ImageInfo image, bool synchronousCall) {
-        var myImage = image.image;
-        Size size = Size(myImage.width.toDouble(), myImage.height.toDouble());
-        completer.complete(size);
-      },
-    ),
-  );
-  return completer.future;
 }

@@ -3,7 +3,7 @@ import 'package:rsvpandcardsmakerapp/presentation/card_design/riverpods/card_des
 
 import '../../../domain/card_desing_model/canvas_widget_object.dart';
 
-var cardDesignProvder =
+var cardDesignProvider =
     StateNotifierProvider<CardDesignStateNotifier, List<CanvasWidgetObject>>(
         (ref) {
   return CardDesignStateNotifier();

@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'dart:math';
@@ -25,35 +28,34 @@ class HelperFunction {
     );
   }
 
-  static String generateUniqueKey(
-      {int length = 32,
-      bool caseSensitive = true,
-      bool includeSpecialChars = true}) {
-    final now = DateTime.now().millisecondsSinceEpoch;
-    final randomPart = _generateRandomString(
-      length: length - now.toString().length,
-      caseSensitive: caseSensitive,
-      includeSpecialChars: includeSpecialChars,
-    );
-    final uniqueString = '${now.toString()}$randomPart';
-    return uniqueString;
-  }
+  static String generateUniqueKey({int length = 64}) {
+    final timestamp = DateTime.now().millisecondsSinceEpoch.toString();
+    final micro = DateTime.now().microsecondsSinceEpoch.toString();
+    final randomValue = Random.secure().nextInt(1 << 32).toString();
+    const alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const specialChars = "!@#\$%&?";
 
-  static String _generateRandomString(
-      {required int length,
-      bool caseSensitive = true,
-      bool includeSpecialChars = true}) {
-    final charPool = caseSensitive
-        ? (includeSpecialChars
-            ? 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#\$%^&*()-_=+[{]}\\|;:",<.>/?'
-            : 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789')
-        : (includeSpecialChars
-            ? 'abcdefghijklmnopqrstuvwxyz0123456789!@#\$%^&*()-_=+[{]}\\|;:",<.>/?'
-            : 'abcdefghijklmnopqrstuvwxyz0123456789');
-    final random = Random.secure();
-    final randomBytes = List<int>.generate(length, (_) => random.nextInt(256));
-    final randomString = String.fromCharCodes(randomBytes
-        .map((byte) => byte % charPool.length + charPool.codeUnitAt(0)));
-    return randomString;
+    // Shuffle the alphabet string
+    final shuffledAlphabet = alphabet.split('')..shuffle();
+    // Select a random subset of characters from the shuffled alphabet
+    final randomAlphabetSubset = shuffledAlphabet
+        .take(length)
+        .join(); // Take 'length' characters from the shuffled alphabet
+
+    // Combine all components into a single list of characters
+    final allChars = (timestamp +
+            randomValue +
+            specialChars +
+            randomAlphabetSubset +
+            micro)
+        .split('')
+      ..shuffle();
+
+    // Combine the shuffled characters into a single string
+    final uniqueString = allChars
+        .join('')
+        .substring(0, length); // Ensure final string is of length 'length'
+
+    return uniqueString;
   }
 }
